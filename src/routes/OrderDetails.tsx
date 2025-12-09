@@ -5,16 +5,18 @@ import { OrderHeader } from "@/components/OrderHeader";
 import { Timeline } from "@/components/Timeline";
 import { Articles } from "@/components/Articles";
 import { ZipUnlock } from "@/components/ZipUnlock";
+import { ActionStatus } from "@/components/ui/action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Order, Shipment } from "@/types/order";
 import { Separator } from "@/components/ui/separator";
+import type { LocationState, Shipment } from "@/types/order";
+import { getStatusWithExplanation } from "@/lib/status";
 
 export default function OrderDetails() {
 	const { id } = useParams<{ id: string }>();
 	const location = useLocation();
-	const state = location.state as { order?: Order } | null;
+	const state = location.state as LocationState | null;
 
 	const [shipments, setShipments] = useState<Shipment[]>([]);
 	const [error, setError] = useState<string | null>(null);
@@ -123,11 +125,11 @@ export default function OrderDetails() {
 			</div>
 		);
 
-	const first: Shipment = shipments[0]!;
+	const firstShipment: Shipment = shipments[0]!;
 
 	return (
 		<div className="max-w-full sm:max-w-4xl mx-auto py-8 px-4 sm:px-0 space-y-10">
-			<OrderHeader order={first} />
+			<OrderHeader order={firstShipment} />
 
 			{!zipValid && (
 				<ZipUnlock
@@ -146,38 +148,55 @@ export default function OrderDetails() {
 
 			{showFullDetails && (
 				<div className="space-y-8">
-					{shipments.map((shipment, idx) => (
-						<Card key={shipment._id} className="shadow-md border rounded-xl">
-							<CardHeader className="pb-3">
-								<CardTitle className="flex justify-between items-center">
-									<div>
-										Shipment
-										{shipments.length > 1 && (
-											<span className="ml-2 text-xs px-2 py-1 bg-primary/10 rounded-full">
-												{idx + 1} of {shipments.length}
-											</span>
-										)}
+					{shipments.map((shipment, idx) => {
+						const statusInfo = getStatusWithExplanation(
+							shipment.checkpoints ?? [],
+							tz,
+						);
+
+						return (
+							<Card key={shipment._id} className="shadow-md border rounded-xl">
+								<CardHeader className="pb-3">
+									<CardTitle className="flex justify-between items-center">
+										<div>
+											Shipment
+											{shipments.length > 1 && (
+												<span className="ml-2 text-xs px-2 py-1 bg-primary/10 rounded-full">
+													{idx + 1} of {shipments.length}
+												</span>
+											)}
+										</div>
+									</CardTitle>
+
+									<div className="text-sm text-muted-foreground mt-1">
+										Tracking:{" "}
+										<span className="font-mono">
+											{shipment.tracking_number ?? "N/A"}
+										</span>
 									</div>
-								</CardTitle>
+								</CardHeader>
 
-								<div className="text-sm text-muted-foreground mt-1">
-									Tracking:{" "}
-									<span className="font-mono">
-										{shipment.tracking_number ?? "N/A"}
-									</span>
-								</div>
-							</CardHeader>
+								<CardContent className="grid gap-6 pt-2">
+									{statusInfo && (
+										<ActionStatus
+											label={statusInfo.computed.label}
+											explanation={statusInfo.explanation}
+											nextAction={statusInfo.nextAction}
+											bgColor={"blue"}
+										/>
+									)}
 
-							<CardContent className="grid gap-6 pt-2">
-								{shipment.delivery_info?.articles?.length && (
-									<Articles articles={shipment.delivery_info.articles} />
-								)}
-								<Separator className="my-1" />
+									<Separator className="my-1" />
 
-								<Timeline checkpoints={shipment.checkpoints ?? []} tz={tz} />
-							</CardContent>
-						</Card>
-					))}
+									{(shipment.delivery_info?.articles?.length ?? 0) > 0 && (
+										<Articles articles={shipment.delivery_info!.articles!} />
+									)}
+
+									<Timeline checkpoints={shipment.checkpoints ?? []} tz={tz} />
+								</CardContent>
+							</Card>
+						);
+					})}
 				</div>
 			)}
 
@@ -186,7 +205,7 @@ export default function OrderDetails() {
 					Contact Support
 				</Button>
 
-				{first.delivery_info?.orderNo && (
+				{firstShipment.delivery_info?.orderNo && (
 					<Button asChild className="py-5 text-base">
 						<a href="#" target="_blank" rel="noopener noreferrer">
 							Track on Carrier Site

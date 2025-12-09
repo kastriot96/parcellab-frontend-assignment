@@ -1,10 +1,6 @@
 import { Clock, Package } from "lucide-react";
-import { useMemo } from "react";
-import { getStatusWithExplanation } from "@/lib/status";
 import type { InfoItemProps, Order } from "@/types/order";
-import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { ActionStatus } from "@/components/ui/action";
 
 function InfoItem({ label, value, capitalize }: InfoItemProps) {
 	if (!value) return null;
@@ -22,12 +18,6 @@ export function OrderHeader({ order }: { order: Order }) {
 	const info = order.delivery_info;
 	const tz = info?.timezone ?? "UTC";
 
-	const statusInfo = useMemo(() => {
-		return order.checkpoints
-			? getStatusWithExplanation(order.checkpoints, tz)
-			: null;
-	}, [order, tz]);
-
 	const orderNo = info?.orderNo ?? order._id;
 	const eta = info?.announced_delivery_date
 		? new Date(info.announced_delivery_date).toLocaleDateString("en-US", {
@@ -41,11 +31,6 @@ export function OrderHeader({ order }: { order: Order }) {
 				<CardTitle className="flex items-center gap-2">
 					<Package className="text-primary" size={28} />
 					Order <span className="font-mono">{orderNo}</span>
-					{statusInfo && (
-						<Badge className="ml-2" variant="outline">
-							{statusInfo.computed.label}
-						</Badge>
-					)}
 				</CardTitle>
 			</CardHeader>
 
@@ -67,17 +52,6 @@ export function OrderHeader({ order }: { order: Order }) {
 						value={order.destination_country_iso3}
 					/>
 				</div>
-
-				{statusInfo && (
-					<ActionStatus
-						label={statusInfo.computed.label}
-						explanation={statusInfo.explanation}
-						nextAction={statusInfo.nextAction}
-						bgColor={
-							statusInfo.computed.code === "failed_attempt" ? "gray" : "blue"
-						}
-					/>
-				)}
 			</CardContent>
 
 			{eta && (
