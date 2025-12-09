@@ -1,6 +1,6 @@
 import type { Article } from "@/types/order";
-import { CardContent, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
+import { CardContent, CardTitle } from "./ui/card";
 
 export function Articles({ articles }: { articles?: Article[] }) {
 	if (!articles || articles.length === 0) {
@@ -18,7 +18,7 @@ export function Articles({ articles }: { articles?: Article[] }) {
 					>
 						{article.articleImageUrl ? (
 							<a
-								href={`https://shop.example.com/articles/${article.articleNo}`}
+								href={`https://parcellab.com/`}
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label={`View ${article.articleName} in shop`}
@@ -49,7 +49,11 @@ export function Articles({ articles }: { articles?: Article[] }) {
 									size="sm"
 									className="px-0 text-xs underline"
 								>
-									<a href={`#`} target="_blank" rel="noopener noreferrer">
+									<a
+										href={`https://parcellab.com/`}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
 										View in shop
 									</a>
 								</Button>

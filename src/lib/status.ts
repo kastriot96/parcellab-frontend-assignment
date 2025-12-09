@@ -1,7 +1,7 @@
+import { getLatestCheckpoint, mapCheckpointToStatus } from "@/lib/utils";
 import type { Checkpoint } from "@/types/order";
-import { STATUS_LABELS, STATUS_EXPLANATIONS } from "@/types/partials/constants";
-import { mapCheckpointToStatus, getLatestCheckpoint } from "@/lib/utils";
 import type { ComputedStatus } from "@/types/partials/constants";
+import { STATUS_EXPLANATIONS, STATUS_LABELS } from "@/types/partials/constants";
 
 export function computeStatus(checkpoints: Checkpoint[]): {
 	code: ComputedStatus;

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { getStatusWithExplanation } from "@/lib/status";
 import type { Checkpoint } from "@/types/order";
 

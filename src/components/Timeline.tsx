@@ -17,6 +17,7 @@ export function Timeline({
 	);
 
 	return (
+		// biome-ignore lint/suspicious/noArrayIndexKey: synthetic data without stable ids
 		<div className="relative mb-4">
 			{sortedCheckpoints.map((checkpoint, index) => {
 				const isMostRecent = index === 0;
@@ -24,6 +25,7 @@ export function Timeline({
 				const isLast = index === sortedCheckpoints.length - 1;
 
 				return (
+					// biome-ignore lint/suspicious/noArrayIndexKey: synthetic data without stable ids
 					<div key={index} className="grid gap-1 relative">
 						<ProgressBar
 							isMostRecent={isMostRecent}

@@ -1,17 +1,17 @@
 import { AlertCircle, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { Articles } from "@/components/Articles";
 import { OrderHeader } from "@/components/OrderHeader";
 import { Timeline } from "@/components/Timeline";
-import { Articles } from "@/components/Articles";
-import { ZipUnlock } from "@/components/ZipUnlock";
 import { ActionStatus } from "@/components/ui/action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import type { LocationState, Shipment } from "@/types/order";
+import { ZipUnlock } from "@/components/ZipUnlock";
 import { getStatusWithExplanation } from "@/lib/status";
+import type { LocationState, Shipment } from "@/types/order";
 
 export default function OrderDetails() {
 	const { id } = useParams<{ id: string }>();
@@ -28,6 +28,10 @@ export default function OrderDetails() {
 
 	const tz = shipments[0]?.delivery_info?.timezone ?? "UTC";
 	const showFullDetails = zipValid;
+
+	function goToLookup() {
+		window.location.href = "/";
+	}
 
 	useEffect(() => {
 		if (state?.order) {
@@ -96,6 +100,7 @@ export default function OrderDetails() {
 	}
 
 	if (error)
+		// biome-ignore lint/suspicious/noArrayIndexKey: synthetic data without stable ids
 		return (
 			<div className="max-w-xl mx-auto py-12 px-4">
 				<Alert className="border-destructive">
@@ -104,11 +109,7 @@ export default function OrderDetails() {
 						Error
 					</AlertTitle>
 					<AlertDescription>{error}</AlertDescription>
-					<Button
-						variant="outline"
-						className="mt-4"
-						onClick={() => (window.location.href = "/")}
-					>
+					<Button variant="outline" className="mt-4" onClick={goToLookup}>
 						Go to Lookup
 					</Button>
 				</Alert>
@@ -207,7 +208,11 @@ export default function OrderDetails() {
 
 				{firstShipment.delivery_info?.orderNo && (
 					<Button asChild className="py-5 text-base">
-						<a href="#" target="_blank" rel="noopener noreferrer">
+						<a
+							href="https://parcellab.com/"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
 							Track on Carrier Site
 						</a>
 					</Button>
