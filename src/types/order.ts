@@ -57,3 +57,19 @@ export interface Shipment {
 	checkpoints?: Checkpoint[];
 	delivery_info?: DeliveryInfo;
 }
+
+export interface ProgressBarProps {
+	isMostRecent: boolean;
+	completed: boolean;
+	isLast: boolean;
+}
+
+export interface LocationState {
+	order?: Order;
+}
+
+export interface InfoItemProps {
+	label: string;
+	value?: string | null;
+	capitalize?: boolean;
+}

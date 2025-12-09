@@ -1,37 +1,81 @@
+import { Clock, Package } from "lucide-react";
 import { useMemo } from "react";
 import { relativeDayLabel } from "@/lib/format";
 import { computeStatus } from "@/lib/status";
-import type { Order } from "@/types/order";
+import type { InfoItemProps, Order } from "@/types/order";
 import { Badge } from "./ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+
+function InfoItem({ label, value, capitalize }: InfoItemProps) {
+	if (!value) return null;
+	return (
+		<div>
+			<div className="text-xs text-muted-foreground">{label}</div>
+			<div className="font-semibold">
+				{capitalize ? value.charAt(0).toUpperCase() + value.slice(1) : value}
+			</div>
+		</div>
+	);
+}
 
 export function OrderHeader({ order }: { order: Order }) {
 	const info = order.delivery_info;
-	const tz = order.delivery_info?.timezone ?? "UTC";
+	const tz = info?.timezone ?? "UTC";
 	const updatedLabel = relativeDayLabel(order.updated, tz);
 	const status = useMemo(
 		() => (order ? computeStatus(order.checkpoints ?? []) : null),
 		[order],
 	);
 
+	const orderNo = info?.orderNo ?? order._id;
+	const eta = info?.announced_delivery_date
+		? new Date(info.announced_delivery_date).toLocaleDateString("en-US", {
+				timeZone: tz,
+			})
+		: null;
+
 	return (
-		<div className="grid gap-2 text-sm">
-			<div className="flex flex-wrap gap-2 items-center">
-				<span className="font-medium">{info?.recipient}</span>
-				<Badge variant="outline">{order.courier?.toUpperCase()}</Badge>
-				<span className="text-muted-foreground">Tracking Nr:</span>
-				<span className="font-mono">{order.tracking_number}</span>
-			</div>
-			<div className="text-muted-foreground">
-				Last update: <span className="font-medium">{updatedLabel}</span>
-			</div>
-			<div className="flex items-center gap-2">
-				<span className="text-sm text-muted-foreground">Computed status:</span>
-				{status && <Badge>{status.label}</Badge>}
-			</div>
-			<div className="text-muted-foreground">
-				Destination:{" "}
-				<span className="font-medium">{order.destination_country_iso3}</span>
-			</div>
-		</div>
+		<Card className="shadow-lg">
+			<CardHeader>
+				<CardTitle className="flex items-center gap-2">
+					<Package className="text-primary" size={28} />
+					Order <span className="font-mono">{orderNo}</span>
+					{status && (
+						<Badge className="ml-2" variant="outline">
+							{status.label}
+						</Badge>
+					)}
+				</CardTitle>
+			</CardHeader>
+
+			<CardContent className="grid gap-6">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+					<InfoItem label="Recipient" value={info?.recipient} />
+					<InfoItem label="Email" value={info?.email} />
+					<InfoItem
+						label="Address"
+						value={
+							info?.street && info?.city
+								? `${info.street}, ${info.city}`
+								: undefined
+						}
+					/>
+					<InfoItem label="Carrier" value={order.courier} capitalize />
+					<InfoItem
+						label="Destination Country"
+						value={order.destination_country_iso3}
+					/>
+				</div>
+			</CardContent>
+
+			{eta && (
+				<div className="flex items-center gap-2 mt-4 ml-6 mb-2">
+					<Clock className="text-muted-foreground" size={18} />
+					<span>
+						ETA: <span className="font-medium">{eta}</span>
+					</span>
+				</div>
+			)}
+		</Card>
 	);
 }

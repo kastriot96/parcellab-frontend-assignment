@@ -10,6 +10,8 @@
    Critical foundational task. Ensures all other features and tests run correctly.
    Without fixing these, further development could produce unreliable results.
 
+3. **FR-005 — Enhance the order details page**  
+   Focused on improving clarity, hierarchy, and usability of the order details page. This is the core experience for end users and has high customer impact.
 
 ## Design Decisions as bullet points
 
@@ -26,6 +28,10 @@
 - Updated the Checkpoint type and test data to match interface requirements.
 - Ensured all test inputs conform to the Order and Checkpoint interfaces.
 
+**FR-005 — Enhance the order details page**
+- Kept OrderHeader component but refactored to simplify layout and make key info more readable.  
+- Timeline display improved using ProgressBar with clear indicators for most recent, completed, and last checkpoint.  
+
 ## Notes on e.g. trade-offs and non-functional requirements solved
 
 Use this document to explain any trade-offs you made, especially around:
@@ -38,3 +44,7 @@ Use this document to explain any trade-offs you made, especially around:
 - Preserved type safety by strictly adhering to TypeScript interfaces.
 - Did not alter business logic only fixed data shape and typings for reliable tests.
 - Ensures all subsequent feature development can rely on passing tests.
+
+**FR-005 — Enhance the order details page**
+- Preserved original card-based design while improving clarity.  
+- Chose readability and maintainability over aggressive DRY in mapping order info fields.  
