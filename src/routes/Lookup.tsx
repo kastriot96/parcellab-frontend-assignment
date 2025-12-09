@@ -26,6 +26,14 @@ export default function Lookup() {
 		setError(null);
 		setLoading(true);
 		try {
+			if (!orderNumber) {
+				setError("Order number is required");
+				return;
+			}
+			if (!zip) {
+				navigate(`/order/${encodeURIComponent(orderNumber)}`);
+				return;
+			}
 			const res = await fetch(
 				`/orders/${encodeURIComponent(orderNumber)}?zip=${encodeURIComponent(zip)}`,
 			);
@@ -74,14 +82,13 @@ export default function Lookup() {
 							/>
 						</div>
 						<div className="grid gap-2">
-							<Label htmlFor="zip">ZIP code</Label>
+							<Label htmlFor="zip">ZIP code (optional)</Label>
 							<Input
 								id="zip"
 								value={zip}
 								onChange={(e) => setZip(e.target.value)}
 								autoComplete="off"
 								placeholder="e.g. 60156"
-								required
 							/>
 						</div>
 						<Button

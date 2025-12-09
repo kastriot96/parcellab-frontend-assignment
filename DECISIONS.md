@@ -19,6 +19,11 @@
 5. **FR-006 Clearly show the user the current status and the next action (for them or the carrier)**  
    Ensures the user knows both the current order status and the next step.
 
+6. **FR-003 — Optional ZIP input to disclose additional order and tracking information**  
+   Focused on giving users the ability to unlock full tracking details using a ZIP code.
+   If the ZIP is not provided, only partial information is shown (latest checkpoint and basic order info).
+
+
 ## Design Decisions as bullet points
 
 **DEF-002 — Orders with two tracking numbers show only one tracking timeline**  
@@ -48,6 +53,13 @@
 - Maps checkpoint statuses to human-readable labels and short explanations.
 - Enhanced OrderHeader.tsx to prominently display current status and next action.
 
+**FR-003 — Optional ZIP input to unlock full tracking details**  
+- Added a ZIP input form when order is accessed with only the order number.
+- If ZIP is correct, full order details including timeline and articles are revealed.
+- If ZIP is invalid, show a "Lookup failed: ZIP mismatch" alert.
+- The ZIP form is designed to be reusable as a small UI component if needed elsewhere.
+- Prevents exposing full order info without ZIP validation.
+
 ## Notes on e.g. trade-offs and non-functional requirements solved
 
 Use this document to explain any trade-offs you made, especially around:
@@ -73,3 +85,8 @@ Use this document to explain any trade-offs you made, especially around:
 - Status and next action are now immediately visible without needing to scroll.
 - Rule-based mapping ensures consistent labels and explanations even with varying carrier checkpoint strings.
 - Uses structured nextAction logic for clarity and potential analytics.
+
+**FR-003 — Optional ZIP input to unlock full tracking details**  
+- ZIP input allows users to unlock full details safely.
+- Implemented robust error handling for invalid or missing ZIPs.
+- Form is visually consistent with existing UI elements and could be reused as a standalone component.
