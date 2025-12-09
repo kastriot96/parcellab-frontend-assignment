@@ -13,6 +13,9 @@
 3. **FR-005 — Enhance the order details page**  
    Focused on improving clarity, hierarchy, and usability of the order details page. This is the core experience for end users and has high customer impact.
 
+4. **FR-004 UX improvement: show articles included in the order**  
+   Focused on showing the article in the order for the client.
+
 ## Design Decisions as bullet points
 
 **DEF-002 — Orders with two tracking numbers show only one tracking timeline**  
@@ -32,6 +35,11 @@
 - Kept OrderHeader component but refactored to simplify layout and make key info more readable.  
 - Timeline display improved using ProgressBar with clear indicators for most recent, completed, and last checkpoint.  
 
+**FR-004 UX improvement: show articles included in the order**  
+- Introduce a new Articles component to render the list of articles for a given order.
+- Integrate the Articles component into OrderDetails, positioned above the delivery timeline.
+- If an article has an image, display it; otherwise, show a fallback placeholder.
+
 ## Notes on e.g. trade-offs and non-functional requirements solved
 
 Use this document to explain any trade-offs you made, especially around:
@@ -48,3 +56,7 @@ Use this document to explain any trade-offs you made, especially around:
 **FR-005 — Enhance the order details page**
 - Preserved original card-based design while improving clarity.  
 - Chose readability and maintainability over aggressive DRY in mapping order info fields.  
+
+**FR-004 UX improvement: show articles included in the order**  
+- Users can now see all articles in an order with name, quantity, price, and images.
+- Maintains design consistency using existing UI components.

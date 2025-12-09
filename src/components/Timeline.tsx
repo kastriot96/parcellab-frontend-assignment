@@ -17,7 +17,7 @@ export function Timeline({
 	);
 
 	return (
-		<div className="relative">
+		<div className="relative mb-4">
 			{sortedCheckpoints.map((checkpoint, index) => {
 				const isMostRecent = index === 0;
 				const completed = index > 0;

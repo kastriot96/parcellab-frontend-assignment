@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { OrderHeader } from "@/components/OrderHeader";
 import { Timeline } from "@/components/Timeline";
+import { Articles } from "@/components/Articles";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,7 +55,6 @@ export default function OrderDetails() {
 						Error
 					</AlertTitle>
 					<AlertDescription>{error}</AlertDescription>
-
 					<Button
 						variant="outline"
 						className="mt-4"
@@ -106,6 +106,13 @@ export default function OrderDetails() {
 						</CardHeader>
 
 						<CardContent className="grid gap-6 pt-2">
+							{/* Articles for this shipment */}
+							{shipment.delivery_info?.articles &&
+								shipment.delivery_info.articles.length > 0 && (
+									<Articles articles={shipment.delivery_info.articles} />
+								)}
+
+							{/* Delivery timeline for this shipment */}
 							<Timeline checkpoints={shipment.checkpoints ?? []} tz={tz} />
 						</CardContent>
 					</Card>
