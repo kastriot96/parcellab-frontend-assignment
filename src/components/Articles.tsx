@@ -1,5 +1,5 @@
 import type { Article } from "@/types/order";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { CardContent, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 
 export function Articles({ articles }: { articles?: Article[] }) {
@@ -8,10 +8,8 @@ export function Articles({ articles }: { articles?: Article[] }) {
 	}
 
 	return (
-		<Card className="shadow-lg">
-			<CardHeader>
-				<CardTitle>Articles in this order</CardTitle>
-			</CardHeader>
+		<>
+			<CardTitle className="text-xl">Articles in this order</CardTitle>
 			<CardContent className="grid gap-3">
 				{articles.map((article) => (
 					<div
@@ -60,6 +58,6 @@ export function Articles({ articles }: { articles?: Article[] }) {
 					</div>
 				))}
 			</CardContent>
-		</Card>
+		</>
 	);
 }

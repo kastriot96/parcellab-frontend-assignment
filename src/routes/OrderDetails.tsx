@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Order, Shipment } from "@/types/order";
+import { Separator } from "@/components/ui/separator";
 
 export default function OrderDetails() {
 	const { id } = useParams<{ id: string }>();
@@ -88,7 +89,7 @@ export default function OrderDetails() {
 						<CardHeader className="pb-3">
 							<CardTitle className="flex justify-between items-center">
 								<div>
-									Shipment {idx + 1}
+									Shipment
 									{shipments.length > 1 && (
 										<span className="ml-2 text-xs px-2 py-1 bg-primary/10 rounded-full">
 											{idx + 1} of {shipments.length}
@@ -96,7 +97,6 @@ export default function OrderDetails() {
 									)}
 								</div>
 							</CardTitle>
-
 							<div className="text-sm text-muted-foreground mt-1">
 								Tracking:{" "}
 								<span className="font-mono">
@@ -104,15 +104,13 @@ export default function OrderDetails() {
 								</span>
 							</div>
 						</CardHeader>
+						<Separator />
 
 						<CardContent className="grid gap-6 pt-2">
-							{/* Articles for this shipment */}
 							{shipment.delivery_info?.articles &&
 								shipment.delivery_info.articles.length > 0 && (
 									<Articles articles={shipment.delivery_info.articles} />
 								)}
-
-							{/* Delivery timeline for this shipment */}
 							<Timeline checkpoints={shipment.checkpoints ?? []} tz={tz} />
 						</CardContent>
 					</Card>

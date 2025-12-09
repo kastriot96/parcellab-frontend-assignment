@@ -16,6 +16,9 @@
 4. **FR-004 UX improvement: show articles included in the order**  
    Focused on showing the article in the order for the client.
 
+5. **FR-006 Clearly show the user the current status and the next action (for them or the carrier)**  
+   Ensures the user knows both the current order status and the next step.
+
 ## Design Decisions as bullet points
 
 **DEF-002 — Orders with two tracking numbers show only one tracking timeline**  
@@ -40,6 +43,11 @@
 - Integrate the Articles component into OrderDetails, positioned above the delivery timeline.
 - If an article has an image, display it; otherwise, show a fallback placeholder.
 
+**FR-006 — Clearly show the user the current status and the next action**  
+- Provides actionable guidance for the user or carrier.
+- Maps checkpoint statuses to human-readable labels and short explanations.
+- Enhanced OrderHeader.tsx to prominently display current status and next action.
+
 ## Notes on e.g. trade-offs and non-functional requirements solved
 
 Use this document to explain any trade-offs you made, especially around:
@@ -60,3 +68,8 @@ Use this document to explain any trade-offs you made, especially around:
 **FR-004 UX improvement: show articles included in the order**  
 - Users can now see all articles in an order with name, quantity, price, and images.
 - Maintains design consistency using existing UI components.
+
+**FR-006 — Clearly show the user the current status and the next action**  
+- Status and next action are now immediately visible without needing to scroll.
+- Rule-based mapping ensures consistent labels and explanations even with varying carrier checkpoint strings.
+- Uses structured nextAction logic for clarity and potential analytics.

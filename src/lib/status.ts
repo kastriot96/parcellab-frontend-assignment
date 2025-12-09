@@ -1,28 +1,63 @@
 import type { Checkpoint } from "@/types/order";
+import { STATUS_LABELS, STATUS_EXPLANATIONS } from "@/types/partials/constants";
+import { mapCheckpointToStatus, getLatestCheckpoint } from "@/lib/utils";
+import type { ComputedStatus } from "@/types/partials/constants";
 
-export type ComputedStatus =
-	| { code: "delivered"; label: "Delivered" }
-	| { code: "ready_for_collection"; label: "Ready for collection" }
-	| { code: "failed_attempt"; label: "Action required" }
-	| { code: "scheduled"; label: "Delivery scheduled" }
-	| { code: "in_transit"; label: "In transit" }
-	| { code: "delayed"; label: "Delayed" };
+export function computeStatus(checkpoints: Checkpoint[]): {
+	code: ComputedStatus;
+	label: string;
+} {
+	const latest = getLatestCheckpoint(checkpoints);
+	if (!latest) return { code: "in_transit", label: STATUS_LABELS.in_transit };
+	const code = mapCheckpointToStatus(latest.status || "");
+	return { code, label: STATUS_LABELS[code] };
+}
 
-export function computeStatus(checkpoints: Checkpoint[]): ComputedStatus {
-	const sorted = [...checkpoints].sort(
-		(a, b) =>
-			new Date(b.event_timestamp).getTime() -
-			new Date(a.event_timestamp).getTime(),
-	);
-	const last = sorted[0];
-	const status = last.status.toLowerCase();
+export function explainStatus(
+	checkpoints: Checkpoint[],
+	tz: string = "UTC",
+): string {
+	const latest = getLatestCheckpoint(checkpoints);
+	if (!latest)
+		return STATUS_EXPLANATIONS.in_transit(
+			{
+				status: "",
+				status_details: "",
+				event_timestamp: new Date().toISOString(),
+				city: "",
+				country_iso3: "",
+			},
+			tz,
+		);
 
-	if (status.includes("transit")) {
-		return { code: "in_transit", label: "In transit" };
+	const code = mapCheckpointToStatus(latest.status || "");
+	return STATUS_EXPLANATIONS[code](latest, tz);
+}
+
+/**
+ * Returns structured info for UI:
+ * - computed status (code + label)
+ * - explanation string
+ * - nextAction string (if user needs to do something)
+ */
+export function getStatusWithExplanation(
+	checkpoints: Checkpoint[],
+	tz: string = "UTC",
+) {
+	const computed = computeStatus(checkpoints);
+	const explanation = explainStatus(checkpoints, tz);
+
+	let nextAction: string | null = null;
+	switch (computed.code) {
+		case "failed_attempt":
+			nextAction = "Action required: Please follow carrier instructions.";
+			break;
+		case "ready_for_collection":
+			nextAction = "Action required: Pick up your parcel.";
+			break;
+		default:
+			nextAction = "No action required.";
 	}
-	if (status.includes("delivered")) {
-		return { code: "delivered", label: "Delivered" };
-	}
 
-	return { code: "in_transit", label: "In transit" };
+	return { computed, explanation, nextAction };
 }
