@@ -11,14 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ZipUnlock } from "@/components/ZipUnlock";
 import { getStatusWithExplanation } from "@/lib/status";
-import type { LocationState, Shipment } from "@/types/order";
+import type { LocationState, Order } from "@/types/order";
 
 export default function OrderDetails() {
 	const { id } = useParams<{ id: string }>();
 	const location = useLocation();
 	const state = location.state as LocationState | null;
 
-	const [shipments, setShipments] = useState<Shipment[]>([]);
+	const [orders, setOrders] = useState<Order[]>([]);
 	const [error, setError] = useState<string | null>(null);
 
 	const [zip, setZip] = useState("");
@@ -26,7 +26,7 @@ export default function OrderDetails() {
 	const [zipValid, setZipValid] = useState(false);
 	const [zipError, setZipError] = useState<string | null>(null);
 
-	const tz = shipments[0]?.delivery_info?.timezone ?? "UTC";
+	const tz = orders[0]?.delivery_info?.timezone ?? "UTC";
 	const showFullDetails = zipValid;
 
 	function goToLookup() {
@@ -44,12 +44,12 @@ export default function OrderDetails() {
 			} else {
 				setZipValid(true);
 			}
-			setShipments([state.order as Shipment]);
+			setOrders([state.order as Order]);
 		}
 	}, [state, location.search]);
 
 	useEffect(() => {
-		if (shipments.length || !id) return;
+		if (orders.length || !id) return;
 
 		let url = `/orders/${encodeURIComponent(id)}`;
 		if (zipValid && zip) url += `?zip=${encodeURIComponent(zip)}`;
@@ -62,15 +62,15 @@ export default function OrderDetails() {
 				}
 				return res.json();
 			})
-			.then((data: Shipment[] | null) => {
+			.then((data: Order[] | null) => {
 				if (!data) return;
 				if (!data.length) {
 					setError("Order not found");
 					return;
 				}
-				setShipments(data);
+				setOrders(data);
 			});
-	}, [id, shipments, zip, zipValid]);
+	}, [id, orders, zip, zipValid]);
 
 	function handleZipSubmit(e: React.FormEvent) {
 		e.preventDefault();
@@ -87,9 +87,9 @@ export default function OrderDetails() {
 				if (!res.ok) throw new Error("ZIP mismatch");
 				return res.json();
 			})
-			.then((data: Shipment[]) => {
+			.then((data: Order[]) => {
 				if (!data.length) throw new Error("Order not found");
-				setShipments(data);
+				setOrders(data);
 				setZipValid(true);
 				setZipError(null);
 			})
@@ -100,7 +100,6 @@ export default function OrderDetails() {
 	}
 
 	if (error)
-		// biome-ignore lint/suspicious/noArrayIndexKey: synthetic data without stable ids
 		return (
 			<div className="max-w-xl mx-auto py-12 px-4">
 				<Alert className="border-destructive">
@@ -116,21 +115,21 @@ export default function OrderDetails() {
 			</div>
 		);
 
-	if (!shipments.length)
+	if (!orders.length)
 		return (
 			<div className="flex flex-col items-center justify-center py-16">
 				<Clock className="animate-spin mb-3" size={36} />
 				<p className="text-lg text-muted-foreground">
-					Loading your shipment details…
+					Loading your order details…
 				</p>
 			</div>
 		);
 
-	const firstShipment: Shipment = shipments[0]!;
+	const firstOrder = orders[0]!;
 
 	return (
 		<div className="max-w-full sm:max-w-4xl mx-auto py-8 px-4 sm:px-0 space-y-10">
-			<OrderHeader order={firstShipment} />
+			<OrderHeader order={firstOrder} />
 
 			{!zipValid && (
 				<ZipUnlock
@@ -149,21 +148,21 @@ export default function OrderDetails() {
 
 			{showFullDetails && (
 				<div className="space-y-8">
-					{shipments.map((shipment, idx) => {
+					{orders.map((order, idx) => {
 						const statusInfo = getStatusWithExplanation(
-							shipment.checkpoints ?? [],
+							order.checkpoints ?? [],
 							tz,
 						);
 
 						return (
-							<Card key={shipment._id} className="shadow-md border rounded-xl">
+							<Card key={order._id} className="shadow-md border rounded-xl">
 								<CardHeader className="pb-3">
 									<CardTitle className="flex justify-between items-center">
 										<div>
-											Shipment
-											{shipments.length > 1 && (
+											Order
+											{orders.length > 1 && (
 												<span className="ml-2 text-xs px-2 py-1 bg-primary/10 rounded-full">
-													{idx + 1} of {shipments.length}
+													{idx + 1} of {orders.length}
 												</span>
 											)}
 										</div>
@@ -172,7 +171,7 @@ export default function OrderDetails() {
 									<div className="text-sm text-muted-foreground mt-1">
 										Tracking:{" "}
 										<span className="font-mono">
-											{shipment.tracking_number ?? "N/A"}
+											{order.tracking_number ?? "N/A"}
 										</span>
 									</div>
 								</CardHeader>
@@ -183,17 +182,17 @@ export default function OrderDetails() {
 											label={statusInfo.computed.label}
 											explanation={statusInfo.explanation}
 											nextAction={statusInfo.nextAction}
-											bgColor={"blue"}
+											bgColor="blue"
 										/>
 									)}
 
 									<Separator className="my-1" />
 
-									{(shipment.delivery_info?.articles?.length ?? 0) > 0 && (
-										<Articles articles={shipment.delivery_info!.articles!} />
+									{(order.delivery_info?.articles?.length ?? 0) > 0 && (
+										<Articles articles={order.delivery_info?.articles} />
 									)}
 
-									<Timeline checkpoints={shipment.checkpoints ?? []} tz={tz} />
+									<Timeline checkpoints={order.checkpoints ?? []} tz={tz} />
 								</CardContent>
 							</Card>
 						);
@@ -206,7 +205,7 @@ export default function OrderDetails() {
 					Contact Support
 				</Button>
 
-				{firstShipment.delivery_info?.orderNo && (
+				{firstOrder.delivery_info?.orderNo && (
 					<Button asChild className="py-5 text-base">
 						<a
 							href="https://parcellab.com/"

@@ -48,16 +48,6 @@ export interface Order {
 	zip_code?: string;
 }
 
-export interface Shipment {
-	_id: string;
-	created: string;
-	updated: string;
-	courier?: string;
-	tracking_number?: string;
-	checkpoints?: Checkpoint[];
-	delivery_info?: DeliveryInfo;
-}
-
 export interface ProgressBarProps {
 	isMostRecent: boolean;
 	completed: boolean;
